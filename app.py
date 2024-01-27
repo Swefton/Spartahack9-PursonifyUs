@@ -2,7 +2,7 @@ from dotenv import load_dotenv
 import os
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
-from flask import Flask, redirect, url_for, session, request
+from flask import Flask, redirect, url_for, session, request, jsonify
 import urllib.parse
 
 load_dotenv()
@@ -22,10 +22,14 @@ def index():
 def callback():
     code = request.args.get('code')
     if code:
-        sp_oauth = spotipy.oauth2.SpotifyOAuth(client_id, client_secret, redirect_uri, scope='user-library-read playlist-read-private', cache_path=".cache")
+        sp_oauth = SpotifyOAuth(client_id, client_secret, redirect_uri, scope='user-library-read playlist-read-private', cache_path=".cache")
         token_info = sp_oauth.get_access_token(code)
 
-        # Save the token in the session for later use
+        sp = spotipy.Spotify(auth=token_info['access_token'])
+        user_info = sp.current_user()
+        user_id = user_info['id']
+
+        session['user_id'] = user_id
         session['token_info'] = token_info
 
         return 'Callback successful! You can now retrieve playlists. <a href="/get_playlists">Get Playlists</a>'
@@ -46,6 +50,7 @@ def login():
     auth_url = f'https://accounts.spotify.com/authorize?{urllib.parse.urlencode(params)}'
     return redirect(auth_url)
 
+
 @app.route('/get_playlists')
 def get_playlists():
     token_info = session.get('token_info', None)
@@ -53,8 +58,37 @@ def get_playlists():
     if token_info and 'access_token' in token_info:
         sp = spotipy.Spotify(auth=token_info['access_token'])
         playlists = sp.current_user_playlists()
-        playlist_names = [playlist['name'] for playlist in playlists['items']]
-        return f'Your playlists: {", ".join(playlist_names)}'
+
+        if playlists and 'items' in playlists:
+            playlist_info_list = []
+
+            for playlist in playlists['items']:
+                try:
+                    playlist_id = playlist['id']
+                    playlist_name = playlist['name']
+
+                    tracks = sp.playlist_tracks(playlist_id, limit=10)
+
+                    total_tracks = tracks['total']
+                    total_duration_ms = sum([track['track']['duration_ms'] for track in tracks['items']])
+                    total_duration_min = total_duration_ms / 60000
+
+                    playlist_info = {
+                        'playlist_name': playlist_name,
+                        'playlist_id': playlist_id,
+                        'total_tracks': total_tracks,
+                        'total_duration_min': total_duration_min,
+                        'trackids': [track['track']['id'] for track in tracks['items']]
+                    }
+
+                    playlist_info_list.append(playlist_info)
+                except:
+                    pass
+
+            return jsonify(playlist_info_list)
+        else:
+            return 'No playlists found for the user.'
+
     else:
         return 'Token not found. Please login first.'
 
