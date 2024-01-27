@@ -16,23 +16,28 @@ app.secret_key = os.urandom(24)
 
 @app.route('/')
 def index():
-    return 'Hello, World! <a href="/login">Login</a>'
+    logout_link = ''
+    if 'user_id' in session:
+        logout_link = '<a href="/logout">Logout</a>'
+    return 'Hello, World! <a href="/login">Login</a> {}'.format(logout_link)
 
 @app.route('/callback')
 def callback():
     code = request.args.get('code')
+    state = request.args.get('state')
+    print(code, state)
     if code:
         sp_oauth = SpotifyOAuth(client_id, client_secret, redirect_uri, scope='user-library-read playlist-read-private', cache_path=".cache")
         token_info = sp_oauth.get_access_token(code)
 
-        sp = spotipy.Spotify(auth=token_info['access_token'])
+        sp = spotipy.Spotify(auth_manager=sp_oauth)
         user_info = sp.current_user()
         user_id = user_info['id']
 
         session['user_id'] = user_id
         session['token_info'] = token_info
 
-        return 'Callback successful! You can now retrieve playlists. <a href="/get_playlists">Get Playlists</a>'
+        return f'Logged in as {user_info}. <a href="/get_playlists">Get Playlists</a>'
     else:
         return 'Error during callback'
 
@@ -50,6 +55,10 @@ def login():
     auth_url = f'https://accounts.spotify.com/authorize?{urllib.parse.urlencode(params)}'
     return redirect(auth_url)
 
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('index'))
 
 @app.route('/get_playlists')
 def get_playlists():
@@ -84,13 +93,24 @@ def get_playlists():
                     playlist_info_list.append(playlist_info)
                 except:
                     pass
-
-            return jsonify(playlist_info_list)
+            print(playlist_info_list)
+            playlist_links = []
+            for playlist_info in playlist_info_list:
+                playlist_id = playlist_info['playlist_id']
+                playlist_links.append(f'<a href="/analysis?playlist_id={playlist_id}">{playlist_info["playlist_name"]}</a>')
+            return '<br>'.join(playlist_links)    
+        
         else:
             return 'No playlists found for the user.'
 
     else:
         return 'Token not found. Please login first.'
+    
+@app.route('/analysis')
+def analysis():
+    playlist_id = request.args.get('playlist_id')
+
+    return f'Analysis for playlist with ID: {playlist_id}'
 
 if __name__ == '__main__':
     app.run()
