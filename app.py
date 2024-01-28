@@ -74,7 +74,6 @@ def logout():
     return redirect(url_for('index'))
 
 @app.route('/get_playlists')
-@app.route('/get_playlists')
 def get_playlists():
     token_info = session.get('token_info', None)
 
