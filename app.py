@@ -13,9 +13,9 @@ from openai import OpenAI
 
 load_dotenv()
 
-client_id = os.getenv("SPOTIFY_CLIENT_ID")
-client_secret = os.getenv("SPOTIFY_CLIENT_SECRET")
-redirect_uri = os.getenv("SPOTIFY_REDIRECT_URI")
+client_id = 'dde8478239f545829d9bd4e77715b803'
+client_secret = '42e3cbda27c74c93b02b9833344780c9'
+redirect_uri = 'https://www.pursonify.us/callback'
 
 def calculate_average(features_list):
     return sum(features_list) / len(features_list) if len(features_list) > 0 else 0
