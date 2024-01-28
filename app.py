@@ -77,7 +77,7 @@ def logout():
 @app.route('/get_playlists')
 def get_playlists():
     token_info = session.get('token_info', None)
-
+    print(token_info)
     if token_info and 'access_token' in token_info:
         sp = spotipy.Spotify(auth=token_info['access_token'])
         playlists = sp.current_user_playlists()
