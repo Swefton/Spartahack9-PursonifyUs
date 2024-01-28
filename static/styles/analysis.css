@@ -1,0 +1,52 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+header {
+    background-color: #27AE6A;
+    color: #fff;
+    padding: 10px;
+    text-align: center;
+}
+
+main {
+    padding: 20px;
+    text-align: center;
+}
+
+.playlist-info {
+    margin-bottom: 20px;
+}
+
+.track-list {
+    text-align: left;
+    margin-top: 20px;
+}
+
+footer {
+    background-color: #27AE6A;
+    color: #fff;
+    padding: 10px;
+    text-align: center;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+.bar-graph {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.bar {
+    height: 20px; /* Adjust the height of the bars as needed */
+    background-color: #27AE6A; /* Color of the bars */
+}
+
+p {
+    margin-left: 10px;
+}

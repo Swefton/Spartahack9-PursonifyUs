@@ -1,0 +1,77 @@
+<!-- analysis.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Playlist Analysis</title>
+    <link rel="stylesheet" href="{{url_for('static', filename='styles/analysis.css')}}">
+</head>
+
+<body>
+    <header>
+        <h1>Pursonify Us</h1>
+    </header>
+
+    <main>
+        <div class="playlist-info">
+            <h2>Playlist Analysis</h2>
+            <p>Playlist Name: {{ playlist_name }}</p>
+            {% if playlist_description != "" %}
+            <p>Playlist Description: {{ playlist_description }}</p>
+            {% endif %}
+        </div>
+
+        <div class="track-list">
+            <h3>Important Tracks</h3>
+            <ul>
+                {% for track in track_details[0:10] %}
+                    <li>{{ track }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="average-features">
+            <h3>Average Audio Features:</h3>
+            <div class="bar-graph">
+                <div class="bar" style="width: {{ avg_acousticness * 100 }}%"></div>
+                <p>Acousticness: {{ avg_acousticness }}</p>
+            </div>
+            <div class="bar-graph">
+                <div class="bar" style="width: {{ avg_danceability * 100 }}%"></div>
+                <p>Danceability: {{ avg_danceability }}</p>
+            </div>
+            <div class="bar-graph">
+                <div class="bar" style="width: {{ avg_energy * 100 }}%"></div>
+                <p>Energy: {{ avg_energy }}</p>
+            </div>
+            <div class="bar-graph">
+                <div class="bar" style="width: {{ avg_instrumentalness * 100 }}%"></div>
+                <p>Instrumentalness: {{ avg_instrumentalness }}</p>
+            </div>
+            <div class="bar-graph">
+                <div class="bar" style="width: {{ avg_liveness * 100 }}%"></div>
+                <p>Liveness: {{ avg_liveness }}</p>
+            </div>
+            <div class="bar-graph">
+                <div class="bar" style="width: {{ avg_loudness * 100 }}%"></div>
+                <p>Loudness: {{ avg_loudness }}</p>
+            </div>
+            <div class="bar-graph">
+                <div class="bar" style="width: {{ avg_speechiness * 100 }}%"></div>
+                <p>Speechiness: {{ avg_speechiness }}</p>
+            </div>
+            <div class="bar-graph">
+                <div class="bar" style="width: {{ avg_tempo * 100 }}%"></div>
+                <p>Tempo: {{ avg_tempo }}</p>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>Made with &hearts; by Amrit</p>
+    </footer>
+</body>
+
+</html>

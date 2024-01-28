@@ -1,0 +1,41 @@
+<!-- playlists.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Playlists</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/playlists.css') }}">
+</head>
+
+<body>
+    <header>
+        <h1>Pursonify Us</h1>
+    </header>
+
+    <main>
+        <div class="playlist-container">
+            {% for playlist_info in playlist_info_list %}
+            <div class="playlist-item" onclick="location.href='{{ url_for('analysis', playlist_id=playlist_info['playlist_id']) }}';">
+                <div class="playlist-image">
+                    <img src="{{ playlist_info['image_url'] }}" alt="Playlist Image">
+                </div>
+                <div class="playlist-info">
+                    <div class="playlist-name">{{ playlist_info['playlist_name'] }}</div>
+                    <div class="playlist-details">
+                        <p>Total Tracks: {{ playlist_info['total_tracks'] }}</p>
+                        <p>Total Duration: {{ playlist_info['total_duration_min'] }} minutes</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </main>
+
+    <footer>
+        <p>Made with &hearts; by Amrit</p>
+    </footer>
+</body>
+
+</html>

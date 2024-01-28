@@ -81,13 +81,14 @@ def get_playlists():
 
                     total_tracks = tracks['total']
                     total_duration_ms = sum([track['track']['duration_ms'] for track in tracks['items']])
-                    total_duration_min = total_duration_ms / 60000
+                    total_duration_min = int(round(total_duration_ms / 60000))
 
                     playlist_info = {
                         'playlist_name': playlist_name,
                         'playlist_id': playlist_id,
                         'total_tracks': total_tracks,
                         'total_duration_min': total_duration_min,
+                        'image_url': playlist['images'][0]['url'] if len(playlist['images']) > 0 else ''
                     }
 
                     playlist_info_list.append(playlist_info)
@@ -97,7 +98,7 @@ def get_playlists():
             for playlist_info in playlist_info_list:
                 playlist_id = playlist_info['playlist_id']
                 playlist_links.append(f'<a href="/analysis?playlist_id={playlist_id}">{playlist_info["playlist_name"]}</a>')
-            return '<br>'.join(playlist_links)    
+            return render_template('playlists.html', playlist_info_list=playlist_info_list)
         
         else:
             return 'No playlists found for the user.'
@@ -112,10 +113,6 @@ def analysis():
         sp = spotipy.Spotify(auth=token_info['access_token'])
         playlist_id = request.args.get('playlist_id')
 
-
-
-        # Get the tracks in the playlist
-        
         playlist_info = sp.playlist(playlist_id, fields='name,description')
         playlist_name = playlist_info['name']
         playlist_description = playlist_info['description']
@@ -162,19 +159,19 @@ def analysis():
         avg_speechiness = calculate_average(speechiness_list)
         avg_tempo = calculate_average(tempo_list)
 
-        return f'Analysis for playlist with ID: {playlist_id} <br>' \
-               f'Playlist Name: {playlist_name} <br>' \
-               f'Playlist Description: {playlist_description} <br>' \
-               f'50 Most Recent Songs:<br>{"<br>".join(track_details)}<br><br>' \
-               f'Average Audio Features:<br>' \
-               f'Acousticness: {avg_acousticness}<br>' \
-               f'Danceability: {avg_danceability}<br>' \
-               f'Energy: {avg_energy}<br>' \
-               f'Instrumentalness: {avg_instrumentalness}<br>' \
-               f'Liveness: {avg_liveness}<br>' \
-               f'Loudness: {avg_loudness}<br>' \
-               f'Speechiness: {avg_speechiness}<br>' \
-               f'Tempo: {avg_tempo}'
+        return render_template('analysis.html',
+                               playlist_id=playlist_id,
+                               playlist_name=playlist_name,
+                               playlist_description=playlist_description,
+                               track_details=track_details,
+                               avg_acousticness=avg_acousticness,
+                               avg_danceability=avg_danceability,
+                               avg_energy=avg_energy,
+                               avg_instrumentalness=avg_instrumentalness,
+                               avg_liveness=avg_liveness,
+                               avg_loudness=avg_loudness,
+                               avg_speechiness=avg_speechiness,
+                               avg_tempo=avg_tempo)
 
     else:
         return redirect('/login')
