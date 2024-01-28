@@ -115,7 +115,13 @@ def analysis():
         sp = spotipy.Spotify(auth=token_info['access_token'])
         playlist_id = request.args.get('playlist_id')
 
+
+
         # Get the tracks in the playlist
+        
+        playlist_info = sp.playlist(playlist_id, fields='name,description')
+        playlist_name = playlist_info['name']
+        playlist_description = playlist_info['description']
         results = sp.playlist_items(playlist_id, fields='items.track(name, id, artists.name, album.name)', limit=50)
 
         # Create a list to store the details of each track
@@ -160,6 +166,8 @@ def analysis():
         avg_tempo = calculate_average(tempo_list)
 
         return f'Analysis for playlist with ID: {playlist_id} <br>' \
+               f'Playlist Name: {playlist_name} <br>' \
+               f'Playlist Description: {playlist_description} <br>' \
                f'50 Most Recent Songs:<br>{"<br>".join(track_details)}<br><br>' \
                f'Average Audio Features:<br>' \
                f'Acousticness: {avg_acousticness}<br>' \
