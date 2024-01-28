@@ -7,7 +7,8 @@ import urllib.parse
 from PIL import Image, ImageDraw
 from io import BytesIO
 import requests
-import base64
+from colorthief import ColorThief
+
 
 load_dotenv()
 
@@ -182,27 +183,36 @@ def analysis():
 
 @app.route('/generate_image')
 def generate_image():
-    # Create a black canvas
-    background = Image.new('RGB', (1920, 1080), 'black')
+    do_desktop = request.args.get('do_generate', type=str)
+    
+    print(do_desktop, type(do_desktop))
+    
+    if do_desktop == "True":
+        background = Image.new('RGB', (1920, 1080), 'black')
+    else:
+        background = Image.new('RGB', (1179,2556), 'black')
 
-    # Load the 512x512 image from the URL (replace 'your_image_url' with the actual URL)
     image_url = 'https://www.wpbeginner.com/wp-content/uploads/2020/03/ultimate-small-business-resource-coronavirus.png'
     image_data = BytesIO(requests.get(image_url).content)
     center_image = Image.open(image_data)
 
-    # Calculate the position to center the image
     x_position = (background.width - center_image.width) // 2
     y_position = (background.height - center_image.height) // 2
 
-    # Paste the centered image onto the black canvas
     background.paste(center_image, (x_position, y_position))
 
-    # Save the result in memory
+    # Use colorthief to get the dominant color of the image
+    color_thief = ColorThief(image_data)
+    dominant_color = color_thief.get_color(quality=1)
+
+    # Set the background color dynamically
+    background = Image.new('RGB', background.size, dominant_color)
+    background.paste(center_image, (x_position, y_position))
+
     output_buffer = BytesIO()
     background.save(output_buffer, format='PNG')
     output_buffer.seek(0)
 
-    # Return the image as binary data with the appropriate content type
     return send_file(output_buffer, mimetype='image/png')
 
 
