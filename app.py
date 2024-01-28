@@ -11,11 +11,14 @@ from colorthief import ColorThief
 from openai import OpenAI
 
 
+
 load_dotenv()
 
-client_id = 'dde8478239f545829d9bd4e77715b803'
-client_secret = '42e3cbda27c74c93b02b9833344780c9'
-redirect_uri = 'https://www.pursonify.us/callback'
+# Access the environment variables
+client_id = os.getenv('CLIENT_ID')
+client_secret = os.getenv('CLIENT_SECRET')
+redirect_uri = os.getenv('REDIRECT_URI')
+
 
 def calculate_average(features_list):
     return sum(features_list) / len(features_list) if len(features_list) > 0 else 0
