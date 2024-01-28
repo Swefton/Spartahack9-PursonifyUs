@@ -8,6 +8,7 @@ from PIL import Image
 from io import BytesIO
 import requests
 from colorthief import ColorThief
+from openai import OpenAI
 
 
 load_dotenv()
@@ -185,7 +186,8 @@ def analysis():
 def generate_image():
     do_desktop = request.args.get('do_generate', type=str)
     
-    print(do_desktop, type(do_desktop))
+    client = OpenAI(api_key="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")
+
     
     if do_desktop == "True":
         background = Image.new('RGB', (1920, 1080), 'black')
