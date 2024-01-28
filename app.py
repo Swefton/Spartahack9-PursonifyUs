@@ -30,6 +30,9 @@ app.secret_key = os.urandom(24)
 app.config['SESSION_COOKIE_SECURE'] = True
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 
+sp_oauth = SpotifyOAuth(client_id, client_secret, redirect_uri, scope='user-library-read playlist-read-private', cache_path=None)
+
+
 @app.route('/')
 def index():
     logout_link = ''
@@ -40,10 +43,9 @@ def index():
 @app.route('/callback')
 def callback():
     code = request.args.get('code')
+    print(code)
     if code:
-        sp_oauth = SpotifyOAuth(client_id, client_secret, redirect_uri, scope='user-library-read playlist-read-private', cache_path=None)
         token_info = sp_oauth.get_access_token(code)
-
         sp = spotipy.Spotify(auth_manager=sp_oauth)
         user_info = sp.current_user()
         user_id = user_info['id']
