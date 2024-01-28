@@ -70,8 +70,8 @@
         </div>
 
         <div class="buttons-container">
-            <a href="{{ url_for('generate_image', do_generate='True',name=playlist_name, disc=playlist_description,tracks=track_details[0:3]) }}" class="button">Desktop Wallpaper</a>
-            <a href="{{ url_for('generate_image', do_generate='False',name=playlist_name, disc=playlist_description,tracks=track_details[0:3]) }}" class="button">Mobile Wallpaper</a>
+            <a href="{{ url_for('generate_image', do_generate='True',name=playlist_name, disc=playlist_description,tracks=track_details) }}" class="button">Desktop Wallpaper</a>
+            <a href="{{ url_for('generate_image', do_generate='False',name=playlist_name, disc=playlist_description,tracks=track_details) }}" class="button">Mobile Wallpaper</a>
         </div>
 
     </main>

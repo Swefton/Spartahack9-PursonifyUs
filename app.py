@@ -196,14 +196,16 @@ def analysis():
 @app.route('/generate_image')
 def generate_image():
     do_desktop = request.args.get('do_generate', type=str)
-    name = request.args.get('playlist_name', type=str)
-    disc = request.args.get('playlist_description', type=str)
-    tracks = request.args.get('track_details', type=str)
+    name = request.args.get('name', type=str)
+    disc = request.args.get('disc', type=str)
+    tracks = request.args.getlist('tracks')
     client = OpenAI(api_key=openai_key)
+
+
 
     response = client.images.generate(
     model="dall-e-2",
-    prompt=f"aesthetic wallpaper titeld {name} about {disc} with {', '.join(tracks)}", 
+    prompt=f"aesthetic wallpaper titeld {name} about {disc} with {', '.join(tracks[0:3])}", 
     size="512x512",
     quality="standard",
     n=1,
@@ -217,7 +219,6 @@ def generate_image():
     else:
         background = Image.new('RGB', (1179,2556), 'black')
 
-    image_url = 'https://www.wpbeginner.com/wp-content/uploads/2020/03/ultimate-small-business-resource-coronavirus.png'
     image_data = BytesIO(requests.get(image_url).content)
     center_image = Image.open(image_data)
 
