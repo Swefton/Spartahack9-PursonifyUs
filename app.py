@@ -4,7 +4,7 @@ import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from flask import Flask, redirect, url_for, session, request, render_template, send_file
 import urllib.parse
-from PIL import Image, ImageDraw
+from PIL import Image
 from io import BytesIO
 import requests
 from colorthief import ColorThief
