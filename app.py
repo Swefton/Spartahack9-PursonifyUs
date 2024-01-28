@@ -40,6 +40,20 @@ def index():
         logout_link = '<a href="/logout">Logout</a>'
     return render_template('landing.html', logout_link=logout_link)
 
+@app.route('/login')
+def login():
+    scope = 'user-library-read playlist-read-private'
+    params = {
+        'client_id': client_id,
+        'response_type': 'code',
+        'scope': scope,
+        'redirect_uri': redirect_uri,
+        'show_dialog': True
+    }
+
+    auth_url = f'https://accounts.spotify.com/authorize?{urllib.parse.urlencode(params)}'
+    return redirect(auth_url)
+
 @app.route('/callback')
 def callback():
     time.sleep(3)
@@ -58,25 +72,13 @@ def callback():
     else:
         return 'Error during callback'
 
-@app.route('/login')
-def login():
-    scope = 'user-library-read playlist-read-private'
-    params = {
-        'client_id': client_id,
-        'response_type': 'code',
-        'scope': scope,
-        'redirect_uri': redirect_uri,
-        'show_dialog': True
-    }
-
-    auth_url = f'https://accounts.spotify.com/authorize?{urllib.parse.urlencode(params)}'
-    return redirect(auth_url)
 
 @app.route('/get_playlists')
 def get_playlists():
+    print(session)
     token_info = session.get('token_info', None)
     time.sleep(3)
-    if token_info and 'access_token' in token_info:
+    if 'access_token' in token_info:
         sp = spotipy.Spotify(auth=token_info['access_token'])
         playlists = sp.current_user_playlists()
 
