@@ -68,9 +68,9 @@
             </div>
         </div>
 
-        <div class="generated-image">
-            <h3>Generated Image:</h3>
-            <img src="data:image/jpeg;base64,{{ img_str }}" alt="Generated Image">
+        <div class="buttons-container">
+            <a href="{{ url_for('generate_image', do_generate=True) }}" class="button">Desktop Wallpaper</a>
+            <a href="{{ url_for('generate_image', do_generate=False) }}" class="button">Mobile Wallppaer</a>
         </div>
 
     </main>
@@ -78,6 +78,25 @@
     <footer>
         <p>Made with &hearts; by Amrit</p>
     </footer>
+
+    <script>
+        // JavaScript to handle hiding/showing the footer on scroll
+        let lastScrollTop = 0;
+    
+        window.addEventListener("scroll", () => {
+            let st = window.pageYOffset || document.documentElement.scrollTop;
+    
+            if (st > lastScrollTop) {
+                // Scrolling down
+                document.querySelector('footer').classList.add('footer-hidden');
+            } else {
+                // Scrolling up
+                document.querySelector('footer').classList.remove('footer-hidden');
+            }
+    
+            lastScrollTop = st <= 0 ? 0 : st; // For mobile or negative scrolling
+        });
+    </script>
 </body>
 
 </html>

@@ -180,7 +180,7 @@ def analysis():
     else:
         return redirect('/login')
 
-@app.route('/generated_image')
+@app.route('/generate_image')
 def generate_image():
     # Create a black canvas
     background = Image.new('RGB', (1920, 1080), 'black')
