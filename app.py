@@ -2,8 +2,12 @@ from dotenv import load_dotenv
 import os
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
-from flask import Flask, redirect, url_for, session, request, render_template
+from flask import Flask, redirect, url_for, session, request, render_template, send_file
 import urllib.parse
+from PIL import Image, ImageDraw
+from io import BytesIO
+import requests
+import base64
 
 load_dotenv()
 
@@ -175,6 +179,32 @@ def analysis():
 
     else:
         return redirect('/login')
+
+@app.route('/generated_image')
+def generate_image():
+    # Create a black canvas
+    background = Image.new('RGB', (1920, 1080), 'black')
+
+    # Load the 512x512 image from the URL (replace 'your_image_url' with the actual URL)
+    image_url = 'https://www.wpbeginner.com/wp-content/uploads/2020/03/ultimate-small-business-resource-coronavirus.png'
+    image_data = BytesIO(requests.get(image_url).content)
+    center_image = Image.open(image_data)
+
+    # Calculate the position to center the image
+    x_position = (background.width - center_image.width) // 2
+    y_position = (background.height - center_image.height) // 2
+
+    # Paste the centered image onto the black canvas
+    background.paste(center_image, (x_position, y_position))
+
+    # Save the result in memory
+    output_buffer = BytesIO()
+    background.save(output_buffer, format='PNG')
+    output_buffer.seek(0)
+
+    # Return the image as binary data with the appropriate content type
+    return send_file(output_buffer, mimetype='image/png')
+
 
 if __name__ == '__main__':
     app.run()
