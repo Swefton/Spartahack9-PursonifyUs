@@ -18,6 +18,7 @@ load_dotenv()
 client_id = os.getenv('SPOTIFY_CLIENT_ID')
 client_secret = os.getenv('SPOTIFY_CLIENT_SECRET')
 redirect_uri = os.getenv('SPOTIFY_REDIRECT_URI')
+openai_key = os.getenv('OPENAI_KEY')
 
 
 def calculate_average(features_list):
@@ -25,6 +26,8 @@ def calculate_average(features_list):
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
+app.config['SESSION_COOKIE_SECURE'] = True
+app.config['SESSION_COOKIE_HTTPONLY'] = True
 
 @app.route('/')
 def index():
@@ -71,14 +74,21 @@ def logout():
     return redirect(url_for('index'))
 
 @app.route('/get_playlists')
+@app.route('/get_playlists')
 def get_playlists():
     token_info = session.get('token_info', None)
-    
+
     if token_info and 'access_token' in token_info:
         sp = spotipy.Spotify(auth=token_info['access_token'])
         playlists = sp.current_user_playlists()
 
         if playlists and 'items' in playlists:
+            # Collect playlist IDs
+            playlist_ids = [playlist['id'] for playlist in playlists['items']]
+
+            # Make a single request to get tracks for all playlists
+            all_tracks = sp.playlist_tracks(playlist_ids, limit=10)
+
             playlist_info_list = []
 
             for playlist in playlists['items']:
@@ -86,7 +96,8 @@ def get_playlists():
                     playlist_id = playlist['id']
                     playlist_name = playlist['name']
 
-                    tracks = sp.playlist_tracks(playlist_id, limit=10)
+                    # Find the tracks for the current playlist
+                    tracks = [track for track in all_tracks if track['id'] == playlist_id]
 
                     total_tracks = tracks['total']
                     total_duration_ms = sum([track['track']['duration_ms'] for track in tracks['items']])
@@ -103,12 +114,14 @@ def get_playlists():
                     playlist_info_list.append(playlist_info)
                 except:
                     pass
+
             playlist_links = []
             for playlist_info in playlist_info_list:
                 playlist_id = playlist_info['playlist_id']
                 playlist_links.append(f'<a href="/analysis?playlist_id={playlist_id}">{playlist_info["playlist_name"]}</a>')
+
             return render_template('playlists.html', playlist_info_list=playlist_info_list)
-        
+
         else:
             return 'No playlists found for the user.'
 
@@ -189,7 +202,7 @@ def analysis():
 def generate_image():
     do_desktop = request.args.get('do_generate', type=str)
     
-    client = OpenAI(api_key="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")
+    client = OpenAI(api_key=openai_key)
 
     
     if do_desktop == "True":
