@@ -193,9 +193,21 @@ def analysis():
 @app.route('/generate_image')
 def generate_image():
     do_desktop = request.args.get('do_generate', type=str)
-    
+    name = request.args.get('playlist_name', type=str)
+    disc = request.args.get('playlist_description', type=str)
+    tracks = request.args.get('track_details', type=str)
     client = OpenAI(api_key=openai_key)
 
+    response = client.images.generate(
+    model="dall-e-2",
+    prompt=f"aesthetic wallpaper titeld {name} about {disc} with {', '.join(tracks)}", 
+    size="512x512",
+    quality="standard",
+    n=1,
+    )
+
+    image_url = response.data[0].url
+    
     
     if do_desktop == "True":
         background = Image.new('RGB', (1920, 1080), 'black')
