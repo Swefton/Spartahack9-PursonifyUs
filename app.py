@@ -15,9 +15,9 @@ from openai import OpenAI
 load_dotenv()
 
 # Access the environment variables
-client_id = os.getenv('CLIENT_ID')
-client_secret = os.getenv('CLIENT_SECRET')
-redirect_uri = os.getenv('REDIRECT_URI')
+client_id = os.getenv('SPOTIFY_CLIENT_ID')
+client_secret = os.getenv('SPOTIFY_CLIENT_SECRET')
+redirect_uri = os.getenv('SPOTIFY_REDIRECT_URI')
 
 
 def calculate_average(features_list):
