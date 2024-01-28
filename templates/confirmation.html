@@ -1,0 +1,101 @@
+<!-- confirmation.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Confirmation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        header {
+            background-color: #27AE6A;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+        }
+
+        main {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .user-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        p {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        a {
+            color: #27AE6A;
+            text-decoration: none;
+            padding: 10px 20px;
+            border: 2px solid #27AE6A;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        a:hover {
+            background-color: #27AE6A;
+            color: #fff;
+        }
+
+        footer {
+            background-color: #27AE6A;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Pursonify Us</h1>
+    </header>
+
+    <main>
+        <div class="user-info">
+            <div class="user-avatar">
+                <img src="{{ user_info['images'][0]['url'] }}" alt="User Avatar">
+            </div>
+            <p>Logged in as {{ user_info['display_name'] }}.</p>
+            <a href="/get_playlists">Get Playlists</a>
+        </div>
+    </main>
+
+    <footer>
+        <p>Made with &hearts; by Amrit</p>
+    </footer>
+</body>
+
+</html>

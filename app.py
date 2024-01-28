@@ -2,7 +2,7 @@ from dotenv import load_dotenv
 import os
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
-from flask import Flask, redirect, url_for, session, request, jsonify
+from flask import Flask, redirect, url_for, session, request, render_template
 import urllib.parse
 
 load_dotenv()
@@ -22,13 +22,11 @@ def index():
     logout_link = ''
     if 'user_id' in session:
         logout_link = '<a href="/logout">Logout</a>'
-    return 'Hello, World! <a href="/login">Login</a> {}'.format(logout_link)
+    return render_template('landing.html', logout_link=logout_link)
 
 @app.route('/callback')
 def callback():
     code = request.args.get('code')
-    state = request.args.get('state')
-    print(code, state)
     if code:
         sp_oauth = SpotifyOAuth(client_id, client_secret, redirect_uri, scope='user-library-read playlist-read-private', cache_path=".cache")
         token_info = sp_oauth.get_access_token(code)
@@ -40,7 +38,7 @@ def callback():
         session['user_id'] = user_id
         session['token_info'] = token_info
 
-        return f'Logged in as {user_info}. <a href="/get_playlists">Get Playlists</a>'
+        return render_template('confirmation.html', user_info=user_info)
     else:
         return 'Error during callback'
 
@@ -95,7 +93,6 @@ def get_playlists():
                     playlist_info_list.append(playlist_info)
                 except:
                     pass
-            print(playlist_info_list)
             playlist_links = []
             for playlist_info in playlist_info_list:
                 playlist_id = playlist_info['playlist_id']
