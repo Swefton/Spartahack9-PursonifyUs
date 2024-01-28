@@ -42,6 +42,7 @@ def index():
 
 @app.route('/callback')
 def callback():
+    time.sleep(3)
     code = request.args.get('code')
     print(code)
     if code:
