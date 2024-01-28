@@ -87,7 +87,6 @@ def get_playlists():
                         'playlist_id': playlist_id,
                         'total_tracks': total_tracks,
                         'total_duration_min': total_duration_min,
-                        'trackids': [track['track']['id'] for track in tracks['items']]
                     }
 
                     playlist_info_list.append(playlist_info)
@@ -108,9 +107,29 @@ def get_playlists():
     
 @app.route('/analysis')
 def analysis():
-    playlist_id = request.args.get('playlist_id')
+    token_info = session.get('token_info', None)
+    if token_info and 'access_token' in token_info:
+        sp = spotipy.Spotify(auth=token_info['access_token'])
+        playlist_id = request.args.get('playlist_id')
 
-    return f'Analysis for playlist with ID: {playlist_id}'
+        # Get the tracks in the playlist
+        results = sp.playlist_items(playlist_id, fields='items.track(name, id, artists.name, album.name)', limit=50)
+
+        # Create a list to store the details of each track
+        track_details = []
+
+        # Populate the track_details list with the details of each track in the playlist
+        for track in results['items']:
+            track_name = track['track']['name']
+            artists = ', '.join([artist['name'] for artist in track['track']['artists']])
+            album_name = track['track']['album']['name']
+            track_details.append(f"{track_name} by {artists} (Album: {album_name})")
+
+        # Display the 50 most recent songs in the playlist
+        return f'Analysis for playlist with ID: {playlist_id} <br>50 Most Recent Songs:<br>{"<br>".join(track_details)}'
+
+    else:
+        return redirect('/login')
 
 if __name__ == '__main__':
     app.run()
