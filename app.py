@@ -72,15 +72,10 @@ def login():
     auth_url = f'https://accounts.spotify.com/authorize?{urllib.parse.urlencode(params)}'
     return redirect(auth_url)
 
-@app.route('/logout')
-def logout():
-    session.clear()
-    return redirect(url_for('index'))
-
 @app.route('/get_playlists')
 def get_playlists():
     token_info = session.get('token_info', None)
-    print(token_info)
+    time.sleep(3)
     if token_info and 'access_token' in token_info:
         sp = spotipy.Spotify(auth=token_info['access_token'])
         playlists = sp.current_user_playlists()
