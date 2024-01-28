@@ -11,6 +11,9 @@ client_id = os.getenv("SPOTIFY_CLIENT_ID")
 client_secret = os.getenv("SPOTIFY_CLIENT_SECRET")
 redirect_uri = os.getenv("SPOTIFY_REDIRECT_URI")
 
+def calculate_average(features_list):
+    return sum(features_list) / len(features_list) if len(features_list) > 0 else 0
+
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
 
@@ -118,15 +121,55 @@ def analysis():
         # Create a list to store the details of each track
         track_details = []
 
-        # Populate the track_details list with the details of each track in the playlist
-        for track in results['items']:
-            track_name = track['track']['name']
-            artists = ', '.join([artist['name'] for artist in track['track']['artists']])
-            album_name = track['track']['album']['name']
-            track_details.append(f"{track_name} by {artists} (Album: {album_name})")
+        # Create lists to store audio feature values for averaging
+        acousticness_list = []
+        danceability_list = []
+        energy_list = []
+        instrumentalness_list = []
+        liveness_list = []
+        loudness_list = []
+        speechiness_list = []
+        tempo_list = []
 
-        # Display the 50 most recent songs in the playlist
-        return f'Analysis for playlist with ID: {playlist_id} <br>50 Most Recent Songs:<br>{"<br>".join(track_details)}'
+        # Populate the track_details list and audio feature lists
+        for track in results['items']:
+            track_id = track['track']['id']
+            track_details.append(track['track']['name'])
+
+            # Get audio features for each track
+            audio_features = sp.audio_features([track_id])[0]
+
+            # Append feature values to respective lists
+            acousticness_list.append(audio_features['acousticness'])
+            danceability_list.append(audio_features['danceability'])
+            energy_list.append(audio_features['energy'])
+            instrumentalness_list.append(audio_features['instrumentalness'])
+            liveness_list.append(audio_features['liveness'])
+            loudness_list.append(audio_features['loudness'])
+            speechiness_list.append(audio_features['speechiness'])
+            tempo_list.append(audio_features['tempo'])
+
+        # Calculate the average of each audio feature
+        avg_acousticness = calculate_average(acousticness_list)
+        avg_danceability = calculate_average(danceability_list)
+        avg_energy = calculate_average(energy_list)
+        avg_instrumentalness = calculate_average(instrumentalness_list)
+        avg_liveness = calculate_average(liveness_list)
+        avg_loudness = calculate_average(loudness_list)
+        avg_speechiness = calculate_average(speechiness_list)
+        avg_tempo = calculate_average(tempo_list)
+
+        return f'Analysis for playlist with ID: {playlist_id} <br>' \
+               f'50 Most Recent Songs:<br>{"<br>".join(track_details)}<br><br>' \
+               f'Average Audio Features:<br>' \
+               f'Acousticness: {avg_acousticness}<br>' \
+               f'Danceability: {avg_danceability}<br>' \
+               f'Energy: {avg_energy}<br>' \
+               f'Instrumentalness: {avg_instrumentalness}<br>' \
+               f'Liveness: {avg_liveness}<br>' \
+               f'Loudness: {avg_loudness}<br>' \
+               f'Speechiness: {avg_speechiness}<br>' \
+               f'Tempo: {avg_tempo}'
 
     else:
         return redirect('/login')
