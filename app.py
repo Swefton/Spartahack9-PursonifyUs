@@ -63,8 +63,8 @@ def callback():
         token_info = sp_oauth.get_access_token(code)
         sp = spotipy.Spotify(auth_manager=sp_oauth)
         user_info = sp.current_user()
+        time.sleep(3)
         user_id = user_info['id']
-
         session['user_id'] = user_id
         session['token_info'] = token_info
 
