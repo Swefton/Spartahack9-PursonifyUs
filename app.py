@@ -9,6 +9,7 @@ from io import BytesIO
 import requests
 from colorthief import ColorThief
 from openai import OpenAI
+import time
 
 
 
@@ -40,7 +41,7 @@ def index():
 def callback():
     code = request.args.get('code')
     if code:
-        sp_oauth = SpotifyOAuth(client_id, client_secret, redirect_uri, scope='user-library-read playlist-read-private', cache_path=".cache")
+        sp_oauth = SpotifyOAuth(client_id, client_secret, redirect_uri, scope='user-library-read playlist-read-private', cache_path=None)
         token_info = sp_oauth.get_access_token(code)
 
         sp = spotipy.Spotify(auth_manager=sp_oauth)
@@ -82,21 +83,14 @@ def get_playlists():
         playlists = sp.current_user_playlists()
 
         if playlists and 'items' in playlists:
-            # Collect playlist IDs
-            playlist_ids = [playlist['id'] for playlist in playlists['items']]
-
-            # Make a single request to get tracks for all playlists
-            all_tracks = sp.playlist_tracks(playlist_ids, limit=10)
-
             playlist_info_list = []
 
-            for playlist in playlists['items']:
+            for playlist in playlists['items'][:3]:
                 try:
                     playlist_id = playlist['id']
                     playlist_name = playlist['name']
 
-                    # Find the tracks for the current playlist
-                    tracks = [track for track in all_tracks if track['id'] == playlist_id]
+                    tracks = sp.playlist_tracks(playlist_id, limit=10)
 
                     total_tracks = tracks['total']
                     total_duration_ms = sum([track['track']['duration_ms'] for track in tracks['items']])
@@ -113,14 +107,12 @@ def get_playlists():
                     playlist_info_list.append(playlist_info)
                 except:
                     pass
-
             playlist_links = []
             for playlist_info in playlist_info_list:
                 playlist_id = playlist_info['playlist_id']
                 playlist_links.append(f'<a href="/analysis?playlist_id={playlist_id}">{playlist_info["playlist_name"]}</a>')
-
             return render_template('playlists.html', playlist_info_list=playlist_info_list)
-
+        
         else:
             return 'No playlists found for the user.'
 
@@ -137,7 +129,7 @@ def analysis():
         playlist_info = sp.playlist(playlist_id, fields='name,description')
         playlist_name = playlist_info['name']
         playlist_description = playlist_info['description']
-        results = sp.playlist_items(playlist_id, fields='items.track(name, id, artists.name, album.name)', limit=50)
+        results = sp.playlist_items(playlist_id, fields='items.track(name, id, artists.name, album.name)', limit=25)
 
         # Create a list to store the details of each track
         track_details = []
@@ -158,6 +150,7 @@ def analysis():
             track_details.append(track['track']['name'])
 
             # Get audio features for each track
+            time.sleep(0.5)
             audio_features = sp.audio_features([track_id])[0]
 
             # Append feature values to respective lists
